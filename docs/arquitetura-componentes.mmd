@@ -1,0 +1,55 @@
+%% Arquitetura de componentes e fluxo de dados da Micro-API de Tarefas
+flowchart LR
+    Client["Cliente interno\nHTTP/JSON"]
+
+    subgraph API["Camada API"]
+        Router["TaskRouter\nrotas FastAPI"]
+        Schemas["Schemas Pydantic\nvalidação de entrada/saída"]
+    end
+
+    subgraph Service["Camada Service"]
+        TaskService["TaskService\nregras de negócio"]
+    end
+
+    subgraph Components["Componentes de domínio"]
+        PriorityAdvisor["PriorityAdvisor\ncontrato de recomendação"]
+        AIAdapter["AI Provider Adapter\nimplementação opcional"]
+    end
+
+    subgraph Repository["Camada Repository"]
+        TaskRepository["TaskRepository\nacesso a dados"]
+        Database[("Banco de dados\nSQLite / SQLAlchemy")]
+    end
+
+    Client -->|"1. requisição HTTP/JSON"| Router
+    Router -->|"2. valida payload"| Schemas
+    Schemas -->|"3. caso de uso"| TaskService
+    TaskService -->|"4. consulta/persistência"| TaskRepository
+    TaskRepository -->|"5. leitura/escrita"| Database
+    Database -->|"6. dados persistidos"| TaskRepository
+    TaskRepository -->|"7. entidade"| TaskService
+    TaskService -.->|"8. solicita sugestão"| PriorityAdvisor
+    PriorityAdvisor -.->|"9. chamada opcional"| AIAdapter
+    AIAdapter -.->|"10. sugestão + justificativa"| PriorityAdvisor
+    PriorityAdvisor -.->|"11. retorno informativo"| TaskService
+    TaskService -->|"12. resultado"| Schemas
+    Schemas -->|"13. resposta validada"| Router
+    Router -->|"14. resposta HTTP/JSON"| Client
+
+    classDef external fill:#eef2ff,stroke:#4f46e5,color:#111827;
+    classDef api fill:#ecfeff,stroke:#0891b2,color:#111827;
+    classDef service fill:#f0fdf4,stroke:#16a34a,color:#111827;
+    classDef component fill:#fff7ed,stroke:#ea580c,color:#111827;
+    classDef repository fill:#faf5ff,stroke:#9333ea,color:#111827;
+
+    class Client external;
+    class Router,Schemas api;
+    class TaskService service;
+    class PriorityAdvisor,AIAdapter component;
+    class TaskRepository,Database repository;
+
+%% Regras de fluxo:
+%% - Somente o Repository acessa diretamente o banco de dados.
+%% - Schemas validam entradas e formatam saídas na fronteira da API.
+%% - PriorityAdvisor é opcional e não altera a prioridade persistida automaticamente.
+%% - A prioridade final depende de confirmação ou atualização explícita da pessoa usuária.

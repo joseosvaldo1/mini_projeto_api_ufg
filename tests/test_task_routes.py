@@ -72,3 +72,21 @@ def test_missing_task_returns_404(client: TestClient) -> None:
 
     assert response.status_code == 404
     assert response.json()["detail"] == "Task not found."
+
+
+def test_health_endpoint_returns_ok_and_utc_timestamp() -> None:
+    """Expose the health check with a UTC timestamp."""
+    from datetime import datetime, timedelta
+
+    from fastapi.testclient import TestClient
+
+    from app.main import app
+
+    with TestClient(app) as client:
+        response = client.get("/health")
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["status"] == "ok"
+    timestamp = datetime.fromisoformat(payload["timestamp"].replace("Z", "+00:00"))
+    assert timestamp.utcoffset() == timedelta(0)

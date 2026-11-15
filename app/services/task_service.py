@@ -1,4 +1,4 @@
-from typing import Protocol
+from typing import NoReturn, Protocol
 from uuid import UUID
 
 from app.model.tasks import PrioritySuggestion, TasjOut, TaskGreate, TaskReplace, taskUpdate
@@ -28,6 +28,10 @@ class TaskService:
         self._repository = repository
         self._priority_advisor = priority_advisor
 
+    @staticmethod
+    def _raise_not_found(task_id: UUID) -> NoReturn:
+        raise TaskNotFoundError(f"Task {task_id} was not found.")
+
     def create_task(self, task: TaskGreate) -> TasjOut:
         """Create a task through the repository."""
         return self._repository.create(task)
@@ -40,7 +44,7 @@ class TaskService:
         """Return a task or raise an error if it does not exist."""
         task = self._repository.get_by_id(task_id)
         if task is None:
-            raise TaskNotFoundError(f"Task {task_id} was not found.")
+            self._raise_not_found(task_id)
         return task
 
     def update_task(
@@ -51,13 +55,13 @@ class TaskService:
         """Update a task or raise an error if it does not exist."""
         task = self._repository.update(task_id, changes)
         if task is None:
-            raise TaskNotFoundError(f"Task {task_id} was not found.")
+            self._raise_not_found(task_id)
         return task
 
     def delete_task(self, task_id: UUID) -> None:
         """Delete a task or raise an error if it does not exist."""
         if not self._repository.delete(task_id):
-            raise TaskNotFoundError(f"Task {task_id} was not found.")
+            self._raise_not_found(task_id)
 
     def suggest_priority(self, task_id: UUID) -> PrioritySuggestion:
         """Return a recommendation without changing the stored task."""

@@ -6,6 +6,9 @@ from uuid import UUID
 from app.model.tasks import TasjOut, TaskGreate, TaskReplace, taskUpdate
 
 
+_TASK_COLUMNS = "id, title, description, completed"
+
+
 class TaskRepository:
     """Persist tasks in a SQLite database."""
 
@@ -53,6 +56,11 @@ class TaskRepository:
             completed=bool(row["completed"]),
         )
 
+    @staticmethod
+    def _task_values(task: TasjOut) -> tuple[str, str | None, int]:
+        """Return database values for a task's editable fields."""
+        return task.title, task.description, int(task.completed)
+
     def create(self, task: TaskGreate) -> TasjOut:
         """Create and return a task with a generated UUID."""
         created = TasjOut(**task.model_dump())
@@ -62,12 +70,7 @@ class TaskRepository:
                 INSERT INTO tasks (id, title, description, completed)
                 VALUES (?, ?, ?, ?)
                 """,
-                (
-                    str(created.id),
-                    created.title,
-                    created.description,
-                    int(created.completed),
-                ),
+                (str(created.id), *self._task_values(created)),
             )
         return created
 
@@ -75,8 +78,8 @@ class TaskRepository:
         """Return a page of tasks in UUID order."""
         with closing(self._connect()) as connection:
             rows = connection.execute(
-                """
-                SELECT id, title, description, completed
+                f"""
+                SELECT {_TASK_COLUMNS}
                 FROM tasks
                 ORDER BY id ASC
                 LIMIT ? OFFSET ?
@@ -89,8 +92,8 @@ class TaskRepository:
         """Return a task by UUID, or None if it does not exist."""
         with closing(self._connect()) as connection:
             row = connection.execute(
-                """
-                SELECT id, title, description, completed
+                f"""
+                SELECT {_TASK_COLUMNS}
                 FROM tasks
                 WHERE id = ?
                 """,
@@ -121,12 +124,7 @@ class TaskRepository:
                 SET title = ?, description = ?, completed = ?
                 WHERE id = ?
                 """,
-                (
-                    updated.title,
-                    updated.description,
-                    int(updated.completed),
-                    str(updated.id),
-                ),
+                (*self._task_values(updated), str(updated.id)),
             )
         return updated
 

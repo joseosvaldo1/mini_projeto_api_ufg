@@ -1,0 +1,111 @@
+﻿1) Prompt 1 - Modelo Pydantic:
+Contexto: API de tarefas em FastAPI para uso interno de equipe.
+Objetivo: Gerar modelos TaskGreate, taskUpdate e TasjOut com tipagem e
+validações
+Estilo: Pydantic v2, codigo limpo e doscstring curtas.
+Resposta: Gere apenas o código de app/model/tasks.py
+
+2) Prompt 2 - Repositório inicial:
+Contexto: Precio de persistência inicial enxuta para viabilizar
+a primeira release.
+Objetivo: Criar TaskRepository em memoria com create, list, get_by_id,
+update e delete.
+Estilo: Python tipado, sem dependências externas.
+Resposta: Crie o arquivo do código ompleto em app/repositories/task_repository.py.
+
+3) Prompt 3 - Service com regra de prioridade:
+Contexto: A prioridade da tarefa pode ser sugerida automaticamente.
+Objetivo: Criar TaskService qye yse TaskRepository e PriorityAdvisor.
+Estilo: Separar regra de negócio da camada de FastAPI
+Resposta: Crie o arquivo do código completo em app/service/task_service.py
+
+4) Prompt 4 - PriorityAdvisor com fallback:
+Contexto: Quero rodar sem custo de API quando não houve chave.
+Objetivo: Implementar PriorityAdvisor com heuristica local e chamada
+opcional a LLM quando OPEAN_API_KEY existir.
+Resposta: Crie o código completo em app/services/priority_advisor.py
+
+5) Prompt 5 - Rotas CRUD:
+Contexto: FastAPI com TaskService pronto.
+Objetivo: Criar rotas POST/GET/PUT/DELETE para tarefas com status
+HTTP corretos e tratamento de error 404.
+Estilo: Router separado em app/api/task_routes.py
+Resposta: Crie o código completo em app/api/task_routes.py
+
+6) Prompt 6 - Revisão técnica:
+Objetivo: Revise os arquivos do core API e responda:
+I) Quais pontos de acoplamento estão altos?
+2) Onde faltam validações?
+3) Quais 5 testes devo prioritzar na próxima release
+Resposta: em checklist
+
+## I) Pontos de acoplamento altos
+
+- task_service.py (/C:/temp/mini_projeto_api_ufg/app/services/task_service.py)
+depende diretamente de TaskRepository, a implementação SQLite. Isso dificulta
+substituir o banco por um repositório simulado em testes; uma interface de
+repositório reduziria o acoplamento.
+- O serviço instancia o advisor concreto dentro de __init__. A criação das
+dependências ficaria mais clara numa fábrica de composição, como get_task_service
+em task_routes.py (/C:/temp/mini_projeto_api_ufg/app/api/task_routes.py).
+- priority_advisor.py (/C:/temp/mini_projeto_api_ufg/app/services/priority_advisor.py)
+importa PrioritySuggestion de task_service.py. É uma dependência invertida entre
+componentes; o tipo de sugestão pode ficar num módulo de modelos compartilhado.
+- As rotas criam o TaskRepository diretamente, então a camada HTTP conhece
+a persistência.
+- Integração faltando: main.py (/C:/temp/mini_projeto_api_ufg/app/main.py) não
+inclui router. Assim, as rotas de tarefas não ficam acessíveis pela aplicação
+FastAPI.
+
+## II) Onde faltam validações
+
+- TaskGreate.title rejeita texto vazio, mas aceita título só com espaços.
+Adicione remoção de espaços e valide o tamanho após essa normalização.
+- taskUpdate aceita null para title e completed; o modelo de saída não
+aceita esses valores. Uma atualização assim pode virar erro 500. Pelo
+contrato atual, apenas description deveria aceitar null.
+- A rota PUT aceita campos parciais e payload vazio por usar taskUpdate.
+Defina se a operação será substituição completa (PUT) ou atualização
+parcial (PATCH) e valide o payload de acordo.
+- A listagem não tem limite nem paginação; pode retornar todas as tarefas.
+- O advisor valida prioridade e justificativa de forma manual, mas falhas
+da API são convertidas silenciosamente em heurística local. Isso mantém
+a sugestão disponível, mas esconde a falha do serviço externo.
+- O repositório trata :memory: como caminho especial, mas abre uma conexão
+SQLite nova por operação. Como o banco em memória pertence à conexão, esse
+modo não preserva a tabela entre chamadas.
+
+## III) Cinco testes para priorizar na próxima release
+
+- Contrato HTTP e integração do router: confirmar que main monta as rotas;
+cobrir CRUD, códigos 201/200/204, UUID inválido 422 e ID inexistente 404.
+- Validação de modelos e atualizações: título só com espaços, limites de
+tamanho, null nos campos e payload vazio.
+- Persistência SQLite: criar e atualizar uma tarefa, reabrir o repositório
+no mesmo arquivo e confirmar os dados; incluir um teste específico para o
+comportamento de :memory:.
+- Advisor sem chave: confirmar que não chama a rede e retorna sugestões
+locais esperadas para termos urgentes, baixa prioridade e caso padrão.
+- Advisor com chave simulada: testar resposta estruturada válida, prioridade
+inválida, timeout e erro HTTP, verificando a política de fallback.
+
+
+# Orientações da revisão técnica:
+- Desacoplar TaskService da implementação SQLite usando um protocolo de
+repositório.
+- Injetar repositório e advisor na composição da aplicação; manter
+PrioritySuggestion em um módulo de modelos compartilhado.
+- Incluir o router de tarefas na aplicação FastAPI.
+- Normalizar títulos removendo espaços nas extremidades e rejeitar títulos
+vazios.
+- Permitir null apenas na descrição; exigir campos completos no PUT e
+rejeitar atualizações parciais vazias.
+- Limitar a listagem a 20 itens por padrão, aceitar limit de 1 a 100 e
+offset maior ou igual a zero.
+- Garantir que SQLite em memória mantenha o banco entre conexões do mesmo
+repositório.
+- Registrar falhas da chamada opcional à LLM sem expor a chave e manter
+fallback local.
+- Priorizar cinco testes: contrato HTTP CRUD/status/404/422; validação de
+modelos; persistência SQLite após reabertura e paginação; heurística sem
+chave e sem rede; resposta LLM estruturada e fallback em falha.

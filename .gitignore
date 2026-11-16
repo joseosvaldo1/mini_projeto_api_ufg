@@ -39,3 +39,6 @@ htmlcov/
 .idea/
 *.swp
 *.swo
+
+# Local-only stakeholder presentation script
+/docs/apresentacao/roteiro.md

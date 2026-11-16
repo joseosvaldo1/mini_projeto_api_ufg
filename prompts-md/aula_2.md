@@ -1,29 +1,31 @@
-1) Prompt 1 - Escopo MVP:
+## Capítulo 2 - Prompts para Codex/Copilot:
+
+# Prompt 1 - Escopo MVP:
 Contexto: MVP de micro-API de tarefas para uso de equipe interna.
 Objetivo: Gerar documento de escopo com objetivo, requisitos funcionais,
 não funcionais e fora de escopo.
 Estilo: Linguagemk técnica, direta e em markdown.
 Resposta: Gere o arquivo com o conteúdo completo em docs/escopo-mvp.md
 
-2) Prompt 2 - Backlog com releases:
+# Prompt 2 - Backlog com releases:
 Contexto: O produto será entregue em três releases: core, qualidade e
 entrega final.
 Objetivo: Criar backlog mínimo com IDs RF/RT e critérios de aceite.
 Estilo: ChecklistMarkdown.
 Resposta: Gere o arquivo com o conteúdo do backlog em docs/backlog.md.
 
-3) Prompt 3 - Arquitetura Mermaid:
+# Prompt 3 - Arquitetura Mermaid:
 Contexto: FastAPI com camadas API, Service, Repository e componentes
 PriorityAdvisor.
 Objetivo: Gerar diagrama Mermaid de componentes e fluxo de dados.
 Resposta: Gere o arquivo em docs/arquitetura-componentes.mmd
 
-4) Prompt 4 - Conventional Commits:
+# Prompt 4 - Conventional Commits:
 Contexto: Adicionei docs/escopo-mvp.md, docs/arquitetura.md e docs/backlog.md
 Objetivo: Sugerir 3 mensagens de commit no padrão Conventional Commits.
 Resposta: Execute os comandos git para os três commits gerados.
 
-5) Prompt - Revisão de planejamento:
+# Prompt 5 - Revisão de planejamento:
 Objetivo: Analise o escopo e o backlog e responda:
 5.1) O que está grande demais para a release inicial?
 5.2) O que está façtando para testabilidade?

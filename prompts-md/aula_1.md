@@ -1,4 +1,6 @@
-1) Prompt 1 - .gitignore:
+## Capítulo 1 - Prompts para Codex/Copilot:
+
+# Prompt 1 - .gitignore:
 
 Contexto: Estou iniciando uma API Python com FastAPI em um repositório
 de produto.
@@ -7,7 +9,7 @@ cache de testes e configurações locais do editor.
 Estilo: Organize por seções com comentários.
 Resposta: Crie o arquivo .gitignore.
 
-2) Prompt - README inicial:
+# Prompt 2 - README inicial:
 
 Contexto: MVP de micro-API para gestão de tarefas com priorização
 assistida por IA.
@@ -16,7 +18,7 @@ localmente e roadmap de releases.
 Estilo: Markdown simples, direto e profissional.
 Resposta: Crie o README completo na pasta raiz do projeto.
 
-3) Prompt - Endpoint de healthcheck:
+# Prompt 3 - Endpoint de healthcheck:
 
 Contexto: Projeto em Python 3.11 com FastAPI.
 Objetivo: Criar app/main.py com uma instância FastAPI e Endpoint
@@ -24,7 +26,7 @@ get /health retornando estatus ok e timestamp.
 Estilo: Tipagem e código limpo
 Resposta: Crie o arquivo fornecendo apenas o código de app/main.py
 
-4) Prompt - requirements.txt
+# Prompt 4 - requirements.txt
 
 Contexto: Exigência do arquivo requirements.txt com as dependências
 a serem utilizadas.
@@ -34,7 +36,7 @@ Estilo: Use o estilo padrão para o requirements.txt.
 Resposta: Realize as instalações e gere o arquivo requirements.txt
 indicando as mesmas.
 
-5) Prompt 5 - revisão crítica:
+# Prompt 5 - revisão crítica:
 Analise o código para app/main.py e responda:
 I) Quais riscos técnicos existem?
 II) O que pode quebrar em produção?
@@ -67,7 +69,7 @@ o registro do endpoint e a serialização.
  e confira que tem deslocamento UTC zero e está dentro desse intervalo. Isso detecta
  tanto a perda do fuso quanto um horário fixado na inicialização.
 
- 6) Prompt - mensagem de commit.
+ # Prompt 6 - mensagem de commit.
  Contexto: Adicionei estrutura inicial, README, .gitignore e endpoint healthcheck
  Objetivo: Gerar uma mensagem de commit no padrão Conventional Commits.
  Resposta: Execute apenas uma linha de commit com uma mensagem sucinta

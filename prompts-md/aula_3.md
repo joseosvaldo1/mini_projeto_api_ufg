@@ -1,11 +1,13 @@
-﻿1) Prompt 1 - Modelo Pydantic:
+﻿## Capítulo 3 - Prompts para Codex/Copilot:
+
+# Prompt 1 - Modelo Pydantic:
 Contexto: API de tarefas em FastAPI para uso interno de equipe.
 Objetivo: Gerar modelos TaskGreate, taskUpdate e TasjOut com tipagem e
 validações
 Estilo: Pydantic v2, codigo limpo e doscstring curtas.
 Resposta: Gere apenas o código de app/model/tasks.py
 
-2) Prompt 2 - Repositório inicial:
+# Prompt 2 - Repositório inicial:
 Contexto: Precio de persistência inicial enxuta para viabilizar
 a primeira release.
 Objetivo: Criar TaskRepository em memoria com create, list, get_by_id,
@@ -13,33 +15,33 @@ update e delete.
 Estilo: Python tipado, sem dependências externas.
 Resposta: Crie o arquivo do código ompleto em app/repositories/task_repository.py.
 
-3) Prompt 3 - Service com regra de prioridade:
+# Prompt 3 - Service com regra de prioridade:
 Contexto: A prioridade da tarefa pode ser sugerida automaticamente.
 Objetivo: Criar TaskService qye yse TaskRepository e PriorityAdvisor.
 Estilo: Separar regra de negócio da camada de FastAPI
 Resposta: Crie o arquivo do código completo em app/service/task_service.py
 
-4) Prompt 4 - PriorityAdvisor com fallback:
+# Prompt 4 - PriorityAdvisor com fallback:
 Contexto: Quero rodar sem custo de API quando não houve chave.
 Objetivo: Implementar PriorityAdvisor com heuristica local e chamada
 opcional a LLM quando OPEAN_API_KEY existir.
 Resposta: Crie o código completo em app/services/priority_advisor.py
 
-5) Prompt 5 - Rotas CRUD:
+# Prompt 5 - Rotas CRUD:
 Contexto: FastAPI com TaskService pronto.
 Objetivo: Criar rotas POST/GET/PUT/DELETE para tarefas com status
 HTTP corretos e tratamento de error 404.
 Estilo: Router separado em app/api/task_routes.py
 Resposta: Crie o código completo em app/api/task_routes.py
 
-6) Prompt 6 - Revisão técnica:
+# Prompt 6 - Revisão técnica:
 Objetivo: Revise os arquivos do core API e responda:
 I) Quais pontos de acoplamento estão altos?
 2) Onde faltam validações?
 3) Quais 5 testes devo prioritzar na próxima release
 Resposta: em checklist
 
-## I) Pontos de acoplamento altos
+I) Pontos de acoplamento altos
 
 - task_service.py (/C:/temp/mini_projeto_api_ufg/app/services/task_service.py)
 depende diretamente de TaskRepository, a implementação SQLite. Isso dificulta
@@ -57,7 +59,7 @@ a persistência.
 inclui router. Assim, as rotas de tarefas não ficam acessíveis pela aplicação
 FastAPI.
 
-## II) Onde faltam validações
+II) Onde faltam validações
 
 - TaskGreate.title rejeita texto vazio, mas aceita título só com espaços.
 Adicione remoção de espaços e valide o tamanho após essa normalização.
@@ -75,7 +77,7 @@ a sugestão disponível, mas esconde a falha do serviço externo.
 SQLite nova por operação. Como o banco em memória pertence à conexão, esse
 modo não preserva a tabela entre chamadas.
 
-## III) Cinco testes para priorizar na próxima release
+III) Cinco testes para priorizar na próxima release
 
 - Contrato HTTP e integração do router: confirmar que main monta as rotas;
 cobrir CRUD, códigos 201/200/204, UUID inválido 422 e ID inexistente 404.

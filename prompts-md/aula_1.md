@@ -1,76 +1,98 @@
-## Capítulo 1 - Prompts para Codex/Copilot:
+# Capítulo 1 — Prompts para Codex/Copilot
 
-# Prompt 1 - .gitignore:
+## Prompt 1 — .gitignore
 
-Contexto: Estou iniciando uma API Python com FastAPI em um repositório
-de produto.
-Objetivo: Gere um arquivo .gitignore para Python, ambiente virtual,
-cache de testes e configurações locais do editor.
-Estilo: Organize por seções com comentários.
-Resposta: Crie o arquivo .gitignore.
+- **Contexto:** Estou iniciando uma API Python com FastAPI em um repositório de produto.
 
-# Prompt 2 - README inicial:
+- **Objetivo:** Gere um arquivo .gitignore para Python, ambiente virtual, cache de testes e
+  configurações locais do editor.
 
-Contexto: MVP de micro-API para gestão de tarefas com priorização
-assistida por IA.
-Objetivo: Escrever um README inicial com objetivo, stack, como rodar
-localmente e roadmap de releases.
-Estilo: Markdown simples, direto e profissional.
-Resposta: Crie o README completo na pasta raiz do projeto.
+- **Estilo:** Organize por seções com comentários.
 
-# Prompt 3 - Endpoint de healthcheck:
+- **Resposta:** Crie o arquivo .gitignore.
 
-Contexto: Projeto em Python 3.11 com FastAPI.
-Objetivo: Criar app/main.py com uma instância FastAPI e Endpoint
-get /health retornando estatus ok e timestamp.
-Estilo: Tipagem e código limpo
-Resposta: Crie o arquivo fornecendo apenas o código de app/main.py
+## Prompt 2 — README inicial
 
-# Prompt 4 - requirements.txt
+- **Contexto:** MVP de micro-API para gestão de tarefas com priorização assistida por IA.
 
-Contexto: Exigência do arquivo requirements.txt com as dependências
-a serem utilizadas.
-Objetico: Realizar a instalação das dependências necessárias para o
-projeto.
-Estilo: Use o estilo padrão para o requirements.txt.
-Resposta: Realize as instalações e gere o arquivo requirements.txt
-indicando as mesmas.
+- **Objetivo:** Escrever um README inicial com objetivo, stack, como rodar localmente e roteiro de
+  releases.
 
-# Prompt 5 - revisão crítica:
+- **Estilo:** Markdown simples, direto e profissional.
+
+- **Resposta:** Crie o README completo na raiz do projeto.
+
+## Prompt 3 — Endpoint de verificação de saúde
+
+- **Contexto:** Projeto em Python 3.11 com FastAPI.
+
+- **Objetivo:** Criar `app/main.py` com uma instância FastAPI e o endpoint `GET /health`, que
+  retorna o status `ok` e um timestamp UTC.
+
+- **Estilo:** Use tipagem e mantenha o código limpo.
+
+- **Resposta:** Crie o arquivo fornecendo apenas o código de app/main.py
+
+## Prompt 4 — requirements.txt
+
+- **Contexto:** O projeto precisa de um `requirements.txt` com as dependências utilizadas.
+
+- **Objetivo:** Instalar as dependências necessárias e registrá-las no arquivo.
+
+- **Estilo:** Siga o formato padrão do `requirements.txt`.
+
+- **Resposta:** Instale as dependências e gere o `requirements.txt` com a lista correspondente.
+
+## Prompt 5 — revisão crítica
+
 Analise o código para app/main.py e responda:
-I) Quais riscos técnicos existem?
-II) O que pode quebrar em produção?
-III) Quais testes mínimos devo criar agora?
-Resposta certa em checklists.
 
-Resposta do codex:
-I) Quais riscos técnicos existem?
-- [ ] Interpretar ok como saúde de toda a API. Hoje, /health confirma
-que a aplicação consegue atender à requisição e gerar uma resposta. Quando
-o projeto integrar um banco ou serviço de IA, a rota continuará retornando
-ok mesmo que essas dependências falhem.
-- [ ] Confiar no horário do servidor. datetime.now(UTC) usa o fuso correto,
-mas um relógio de sistema desajustado produzirá um timestamp incorreto.
-II) O que pode quebrar em produção?
-- [ ] Inicialização com Python anterior ao 3.11. A importação de UTC falhará
-e a aplicação não subirá. Confira a versão do Python no ambiente de implantação.
-- [ ] Verificação de saúde configurada incorretamente. Se o monitor chamar /
-em vez de /health, receberá 404. Em contêiner, se o Uvicorn escutar apenas em
-127.0.0.1, uma verificação externa ao contêiner não conseguirá conectar.
-- [ ] Resposta antiga servida por cache. Se um proxy armazenar /health, o
-monitor poderá receber um ok antigo durante uma falha. Nesse cenário,
-desative o cache para a rota.
-III) Quais testes mínimos criar agora?
-- [ ] Contrato HTTP. Com TestClient(app), faça GET /health e confira código 200,
-conteúdo application/json e campo status igual a "ok". Testar pela rota cobre também
-o registro do endpoint e a serialização.
-- [ ] Validade e atualização do timestamp. Capture o horário UTC imediatamente
- antes e depois da chamada. Converta o timestamp recebido com datetime.fromisoformat()
- e confira que tem deslocamento UTC zero e está dentro desse intervalo. Isso detecta
- tanto a perda do fuso quanto um horário fixado na inicialização.
+#### I. Quais riscos técnicos existem?
 
- # Prompt 6 - mensagem de commit.
- Contexto: Adicionei estrutura inicial, README, .gitignore e endpoint healthcheck
- Objetivo: Gerar uma mensagem de commit no padrão Conventional Commits.
- Resposta: Execute apenas uma linha de commit com uma mensagem sucinta
- apropriada.
+#### II. O que pode quebrar em produção?
+
+#### III. Quais testes mínimos devo criar agora?
+
+Formato da resposta: checklist.
+
+### Resposta do Codex
+
+#### I. Quais riscos técnicos existem?
+
+- [ ] Interpretar ok como saúde de toda a API. Hoje, /health confirma que a aplicação consegue
+      atender à requisição e gerar uma resposta. Quando o projeto integrar um banco ou serviço de
+      IA, a rota continuará retornando ok mesmo que essas dependências falhem.
+
+- [ ] Confiar no horário do servidor. datetime.now(UTC) usa o fuso horário correto, mas um relógio
+      de sistema desajustado produzirá um timestamp incorreto.
+
+#### II. O que pode quebrar em produção?
+
+- [ ] Inicialização com Python anterior ao 3.11. A importação de UTC falhará e a aplicação não
+      subirá. Confira a versão do Python no ambiente de implantação.
+
+- [ ] Verificação de saúde configurada incorretamente. Se o monitor chamar / em vez de /health,
+      receberá 404. Em contêiner, se o Uvicorn escutar apenas em 127.0.0.1, uma verificação externa
+      ao contêiner não conseguirá conectar.
+
+- [ ] Resposta antiga servida por cache. Se um proxy armazenar /health, o monitor poderá receber um
+      ok antigo durante uma falha. Nesse cenário, desative o cache para a rota.
+
+#### III. Quais testes mínimos criar agora?
+
+- [ ] Contrato HTTP. Com TestClient(app), faça GET /health e confira código 200, conteúdo
+      application/json e campo status igual a "ok". Testar pela rota cobre também o registro do
+      endpoint e a serialização.
+
+- [ ] Validade e atualização do timestamp. Capture o horário UTC imediatamente antes e depois da
+      chamada. Converta o timestamp recebido com datetime.fromisoformat() e confira que tem
+      deslocamento UTC zero e está dentro desse intervalo. Isso detecta tanto a perda do fuso quanto
+      um horário fixado na inicialização.
+
+## Prompt 6 — mensagem de commit
+
+- **Contexto:** Adicionei estrutura inicial, README, .gitignore e endpoint de verificação de saúde
+
+- **Objetivo:** Gerar uma mensagem de commit no padrão Conventional Commits.
+
+- **Resposta:** Execute apenas uma linha de commit com uma mensagem sucinta apropriada.
